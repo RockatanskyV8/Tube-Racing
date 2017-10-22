@@ -20,6 +20,20 @@ public class AICarScript : MonoBehaviour {
 	
 	private List<Transform> path; //we use a list so that it can have a dynamic size, meaning the size can change when we need it to
 	
+	//Sensor varibles
+
+    [Header("Sensors")]
+    public float sensorLength = 3f;
+    public Vector3 frontSensorPosition = new Vector3(0f, 0.2f, 0.5f);
+    public float frontSideSensorPosition = 0.2f;
+    public float frontSensorAngle = 30f;
+    private List<Transform> nodes;
+    private int currectNode = 0;
+    private bool avoiding = false;
+
+    private int flag = 0;
+
+    //end of sensor
 	
     public Vector3 centerOfMass;
 
@@ -64,8 +78,10 @@ public class AICarScript : MonoBehaviour {
 	
 	void Update ()
 	{
-		GetSteer();
+		if (flag == 0)
+            GetSteer();
 		Move();
+		Sensors();
 	}
 	
 	void GetSteer ()
@@ -106,5 +122,79 @@ public class AICarScript : MonoBehaviour {
             wheelRL.brakeTorque = decelerationSpeed;
             wheelRR.brakeTorque = decelerationSpeed;
         }
+    }
+	
+	private void Sensors() {
+        RaycastHit hit;
+        Vector3 sensorStartPos = transform.position;
+        sensorStartPos += transform.forward * frontSensorPosition.z;
+        sensorStartPos += transform.up * frontSensorPosition.y;
+        float avoidMultiplier = 0;
+        avoiding = false;
+
+        //front right sensor
+        sensorStartPos += transform.right * frontSideSensorPosition;
+        if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
+            if (!hit.collider.CompareTag("Terrain")) {
+                Debug.DrawLine(sensorStartPos, hit.point);
+                avoiding = true;
+                avoidMultiplier -= 1f;
+            }
+        }
+
+        //front right angle sensor
+        else if (Physics.Raycast(sensorStartPos, Quaternion.AngleAxis(frontSensorAngle, transform.up) * transform.forward, out hit, sensorLength)) {
+            if (!hit.collider.CompareTag("Terrain")) {
+                Debug.DrawLine(sensorStartPos, hit.point);
+                avoiding = true;
+                avoidMultiplier -= 0.5f;
+            }
+        }
+
+        //front left sensor
+        sensorStartPos -= transform.right * frontSideSensorPosition * 2;
+        if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
+            if (!hit.collider.CompareTag("Terrain")) {
+                Debug.DrawLine(sensorStartPos, hit.point);
+                avoiding = true;
+                avoidMultiplier += 1f;
+            }
+        }
+
+        //front left angle sensor
+        else if (Physics.Raycast(sensorStartPos, Quaternion.AngleAxis(-frontSensorAngle, transform.up) * transform.forward, out hit, sensorLength)) {
+            if (!hit.collider.CompareTag("Terrain")) {
+                Debug.DrawLine(sensorStartPos, hit.point);
+                avoiding = true;
+                avoidMultiplier += 0.5f;
+            }
+        }
+
+        //front center sensor
+        if (avoidMultiplier == 0) {
+            if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
+                if (!hit.collider.CompareTag("Terrain")) {
+                    Debug.DrawLine(sensorStartPos, hit.point);
+                    avoiding = true;
+                    if (hit.normal.x < 0) {
+                        avoidMultiplier = -1;
+                    } else {
+                        avoidMultiplier = 1;
+                    }
+                }
+            }
+        }
+
+        if (avoiding) {
+            WheelFL.steerAngle = maxSteer * avoidMultiplier;
+            WheelFR.steerAngle = maxSteer * avoidMultiplier;
+        }
+
+    }
+
+    void AvoidSteer(float sensivety)
+    {
+        WheelFL.steerAngle = maxSteer * sensivety;
+        WheelFR.steerAngle = maxSteer * sensivety;
     }
 }
