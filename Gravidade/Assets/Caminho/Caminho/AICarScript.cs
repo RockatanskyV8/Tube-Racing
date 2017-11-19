@@ -20,19 +20,19 @@ public class AICarScript : MonoBehaviour {
 	
 	private List<Transform> path; //we use a list so that it can have a dynamic size, meaning the size can change when we need it to
 	
-	//Sensor varibles
 
     [Header("Sensors")]
     public float sensorLength = 3f;
     public Vector3 frontSensorPosition = new Vector3(0f, 0.2f, 0.5f);
     public float frontSideSensorPosition = 0.2f;
     public float frontSensorAngle = 30f;
+	public float turnSpeed = 5f;
     private List<Transform> nodes;
     private int currectNode = 0;
     private bool avoiding = false;
+	private float targetSteerAngle;
 
     private int flag = 0;
-
     //end of sensor
 	
     public Vector3 centerOfMass;
@@ -52,18 +52,6 @@ public class AICarScript : MonoBehaviour {
 	
 	void GetPath ()
 	{
-		/*
-		Transform[] path_objs = pathGroup.GetComponentsInChildren<Transform>();
-		path = new List<Transform>();
-		
-		for (int i = 0; i < path_objs.Length; i++)
-		{
-			if (path_objs[i] != pathGroup)
-			{
-				path.Add(path_objs[i]);
-			}
-		}
-		*/
 		Transform[] childObejects = pathGroup.GetComponentsInChildren<Transform>();
 
         for (int i = 0; i < childObejects.Length; i++)
@@ -72,8 +60,6 @@ public class AICarScript : MonoBehaviour {
             if (temp.gameObject.GetInstanceID() != GetInstanceID())
                 path.Add(temp);
         }
-
-        Debug.Log(childObejects.Length);
 	}
 	
 	void Update ()
@@ -82,16 +68,24 @@ public class AICarScript : MonoBehaviour {
             GetSteer();
 		Move();
 		Sensors();
+		LerpSteer ();
+	}
+	
+	void LerpSteer ()
+	{
+		WheelFL.steerAngle = Mathf.Lerp(WheelFL.steerAngle, targetSteerAngle, Time.deltaTime * turnSpeed);
+		WheelFR.steerAngle = Mathf.Lerp(WheelFR.steerAngle, targetSteerAngle, Time.deltaTime * turnSpeed);
+		wheelRL.steerAngle = Mathf.Lerp(WheelFL.steerAngle, targetSteerAngle, Time.deltaTime * turnSpeed);
+		wheelRR.steerAngle = Mathf.Lerp(WheelFR.steerAngle, targetSteerAngle, Time.deltaTime * turnSpeed);
+		
+		
 	}
 	
 	void GetSteer ()
 	{
 		Vector3 steerVector = transform.InverseTransformPoint(new Vector3(path[currentPathObj].position.x, transform.position.y, path[currentPathObj].position.z));
 		float newSteer = maxSteer * (steerVector.x / steerVector.magnitude);
-		//dir = steerVector.x / steerVector.magnitude;
-		WheelFL.steerAngle = newSteer;
-		WheelFR.steerAngle = newSteer;
-		
+		targetSteerAngle = newSteer;
 		if (steerVector.magnitude <= remainDistance)
         {
             currentPathObj++;
@@ -112,15 +106,8 @@ public class AICarScript : MonoBehaviour {
         {
             wheelRL.motorTorque = maxTorque;
             wheelRR.motorTorque = maxTorque;
-            wheelRL.brakeTorque = 0;
-            wheelRR.brakeTorque = 0;
-        }
-        else
-        {
-            wheelRL.motorTorque = 0;
-            wheelRR.motorTorque = 0;
-            wheelRL.brakeTorque = decelerationSpeed;
-            wheelRR.brakeTorque = decelerationSpeed;
+            wheelRL.motorTorque = maxTorque;
+            wheelRR.motorTorque = maxTorque;
         }
     }
 	
@@ -131,9 +118,38 @@ public class AICarScript : MonoBehaviour {
         sensorStartPos += transform.up * frontSensorPosition.y;
         float avoidMultiplier = 0;
         avoiding = false;
-
+		
+		//front center sensor
+        if (avoidMultiplier == 0) {
+            if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
+                if (!hit.collider.CompareTag("Terrain")) {
+                    Debug.DrawLine(sensorStartPos, hit.point);
+                    avoiding = true;
+                    if (hit.normal.x < 0) {
+                        avoidMultiplier = -1;
+                    } else {
+                        avoidMultiplier = 1;
+                    }
+                }
+            }
+        }
+		
         //front right sensor
-        sensorStartPos += transform.right * frontSideSensorPosition;
+        if (avoidMultiplier == 0) {
+            if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
+                if (!hit.collider.CompareTag("Terrain")) {
+                    Debug.DrawLine(sensorStartPos, hit.point);
+                    avoiding = true;
+                    if (hit.normal.x < 0) {
+                        avoidMultiplier = -1;
+                    } else {
+                        avoidMultiplier = 1;
+                    }
+                }
+            }
+        }
+		
+		sensorStartPos += transform.right * frontSideSensorPosition;
         if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
             if (!hit.collider.CompareTag("Terrain")) {
                 Debug.DrawLine(sensorStartPos, hit.point);
@@ -169,32 +185,14 @@ public class AICarScript : MonoBehaviour {
                 avoidMultiplier += 0.5f;
             }
         }
-
-        //front center sensor
-        if (avoidMultiplier == 0) {
-            if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)) {
-                if (!hit.collider.CompareTag("Terrain")) {
-                    Debug.DrawLine(sensorStartPos, hit.point);
-                    avoiding = true;
-                    if (hit.normal.x < 0) {
-                        avoidMultiplier = -1;
-                    } else {
-                        avoidMultiplier = 1;
-                    }
-                }
-            }
-        }
+		
+		Debug.Log(avoidMultiplier);
 
         if (avoiding) {
-            WheelFL.steerAngle = maxSteer * avoidMultiplier;
-            WheelFR.steerAngle = maxSteer * avoidMultiplier;
-        }
+            targetSteerAngle = maxSteer * avoidMultiplier;
+        } else {
+			targetSteerAngle = 0;
+		}
 
-    }
-
-    void AvoidSteer(float sensivety)
-    {
-        WheelFL.steerAngle = maxSteer * sensivety;
-        WheelFR.steerAngle = maxSteer * sensivety;
     }
 }

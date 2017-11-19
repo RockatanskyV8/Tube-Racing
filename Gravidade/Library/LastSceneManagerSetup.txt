@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Caminho/Caminho.unity
+- path: Assets/Cenas/Gravidade4-5.unity
   isLoaded: 1
   isActive: 1
