@@ -53,6 +53,7 @@
   <ItemGroup>
      <Compile Include="Assets\Caminho\Caminho\AICarScript.cs" />
      <Compile Include="Assets\Caminho\Caminho\PathScript.cs" />
+     <Compile Include="Assets\Colisor.cs" />
      <Compile Include="Assets\Scripts\Cilindro\CilindroAttractor.cs" />
      <Compile Include="Assets\Scripts\Cilindro\CilindroBodyAttractor.cs" />
      <Compile Include="Assets\Scripts\Cilindro\Corpo.cs" />
@@ -67,8 +68,8 @@
      <Compile Include="Assets\Scripts\Mais Scripts\PhysicsEngine.cs" />
      <Compile Include="Assets\Scripts\Mais Scripts\RocketEngine.cs" />
      <Compile Include="Assets\Scripts\Mais Scripts\UniversalGravitation.cs" />
-     <Compile Include="Assets\suspencao\EasySuspension.cs" />
-     <Compile Include="Assets\suspencao\RearWheelDrive.cs" />
+     <Compile Include="Assets\Scripts\suspencao\EasySuspension.cs" />
+     <Compile Include="Assets\Scripts\suspencao\RearWheelDrive.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
