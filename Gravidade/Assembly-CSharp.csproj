@@ -53,15 +53,15 @@
   <ItemGroup>
      <Compile Include="Assets\Caminho\Caminho\AICarScript.cs" />
      <Compile Include="Assets\Caminho\Caminho\PathScript.cs" />
-     <Compile Include="Assets\Colisor.cs" />
-     <Compile Include="Assets\Gerador.cs" />
      <Compile Include="Assets\Scripts\Cilindro\CilindroAttractor.cs" />
      <Compile Include="Assets\Scripts\Cilindro\CilindroBodyAttractor.cs" />
      <Compile Include="Assets\Scripts\Cilindro\Corpo.cs" />
      <Compile Include="Assets\Scripts\Cilindro\Gravidade.cs" />
+     <Compile Include="Assets\Scripts\Colisor.cs" />
      <Compile Include="Assets\Scripts\Esfera\CharacterController.cs" />
      <Compile Include="Assets\Scripts\Esfera\FauxGravityAttractor.cs" />
      <Compile Include="Assets\Scripts\Esfera\FauxGravityBody.cs" />
+     <Compile Include="Assets\Scripts\Gerador.cs" />
      <Compile Include="Assets\Scripts\Mais Scripts\FluidDrag.cs" />
      <Compile Include="Assets\Scripts\Mais Scripts\InitialVelocity.cs" />
      <Compile Include="Assets\Scripts\Mais Scripts\Laucher.cs" />

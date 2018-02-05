@@ -6,7 +6,7 @@
       <File FileName="Assets\Scripts\Cilindro\Corpo.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Esfera\FauxGravityAttractor.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Esfera\FauxGravityBody.cs" Line="1" Column="1" />
-      <File FileName="Assets\Caminho\Caminho\AICarScript.cs" Line="190" Column="61" />
+      <File FileName="Assets\Caminho\Caminho\AICarScript.cs" Line="31" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -8,12 +8,16 @@ public class Gerador : MonoBehaviour {
 	
 	private Transform carro;
 	private float spawnZ = 0.0f;
-	private float pistaLength = 210f;
-	private int quantPistas = 1;
+	private float pistaLength = 20f;
+	private int quantPistas = 3;
 	
 	// Use this for initialization
 	void Start () {
 		carro = GameObject.FindGameObjectWithTag("Carro").transform;
+		for(int i = 0; i < quantPistas; i++)
+		{
+			Summoner();
+		}
 	}
 	
 	// Update is called once per frame
